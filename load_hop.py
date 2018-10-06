@@ -3,29 +3,35 @@ import random
 PREFIX="http://data.linkedmdb.org/"
 
 def out_degree(url):
-    g1=rdflib.Graph()
-    g1.parse(url)
-    # print(g1.)
     deg=0
-    actor_id=url.split("/")[-1]
-    for s,p,o in g1:
-        if PREFIX in p:
-            #print(s,p,o)
-            deg+=1
+    if PREFIX in url:
+        g1=rdflib.Graph()
+        g1.parse(url)
+        # print(g1.)
+        actor_id=url.split("/")[-1]
+        for s,p,o in g1:
+            if PREFIX in p:
+                #print(s,p,o)
+                deg+=1
     return deg
+
 def weight(url):
     g1=rdflib.Graph()
     g1.parse(url)
     # print(g1.)
     weight_edge=0
-    actor_id=url.split("/")[-1]
-    for s,p,o in g1:
-        if PREFIX in o:
-            #print("Object:",o)
-            try:
-                weight_edge+=out_degree(o)
-            except:
-                pass
+    if PREFIX in url:
+        g1=rdflib.Graph()
+        g1.parse(url)
+        # print(g1.)
+        actor_id=url.split("/")[-1]
+        for s,p,o in g1:
+            if PREFIX in o:
+                #print("Object:",o)
+                try:
+                    weight_edge+=out_degree(o)
+                except:
+                    pass
     return weight_edge
 def comp(s1):
     return weight(s1)
@@ -66,12 +72,22 @@ def main():
     print(out_degree(base_url[:-4]+"data/"+class_name+"/"+actor_id[0]))
     print("Weight of first one :",uri_actor_id[0],weight(uri_actor_id[0]))
 
-    uri_actor_id_dict={}
-    for i in uri_actor_id:
-        uri_actor_id_dict[i]=weight(i)
-    
-    #writing the dictionary as csv
     import csv
+    uri_actor_id_dict={}
+    row = 1
+    temp_file=open("temp_csv.csv","a")
+    temp_csv = csv.writer(temp_file)
+    for i in uri_actor_id:
+        try:
+            uri_actor_id_dict[i]=weight(i)
+            temp_csv.writerow([row,i,uri_actor_id_dict[i]])
+            temp_file.flush()
+            print(row,i,uri_actor_id_dict[i])
+            row = row+1
+        except:
+            pass
+
+    #writing the dictionary as csv
     w = csv.writer(open("actor_id_weight.csv", "w"))
     for key, val in dict.items():
         w.writerow([key, val])
