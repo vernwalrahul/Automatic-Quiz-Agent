@@ -102,15 +102,15 @@ def URLQuestionsCompute(url,URLname,URLid):
                 label_S,type_P=FindLabel(s)
                 if label_S:
                     KnowledgeGraph[URLname][GRAPH].append(((label_S,type_P),p.split("/")[-1]))
-            except:
-                pass
+            except Exception as e:
+                print("Error: ",e)
         if (str(URLid) in s) and (PREFIX in o) and isdigit(o.split("/")[-1]):
             try:
                 label_O,type_P=FindLabel(o)
                 if label_O:
                     KnowledgeGraph[URLname][GRAPH].append(((label_O,type_P),p.split("/")[-1]))
-            except:
-                pass
+            except Exception as e:
+                print("Error: ",e)
 
 def RankEntitiesBasedOnClass(base_url,class_name):
     class_name.lower().strip()
@@ -152,11 +152,11 @@ def RankEntitiesBasedOnClass(base_url,class_name):
 def KnowledgeGraphCompute(base_url,class_name):
     base_url,class_name,actor_id,entities=RankEntitiesBasedOnClass(base_url,class_name)
     
-    for i in range(len(entities)):
+    for i in range(1):
         URLQuestionsCompute(base_url[:-4]+"data/"+class_name+"/"+actor_id[i],entities[i],actor_id[i])
         save_obj(KnowledgeGraph,"KnowledgeGraph_"+class_name)
     KG=load_obj("KnowledgeGraph_"+class_name)
-    print(KG)
+    # print(type(KG))
 
 def main():
     ListOfClasses=["actor","cinematographer","director","editor","film_art_director","film_casting_director"
@@ -164,11 +164,10 @@ def main():
      "film_festival_sponsor","film_production_designer","film_story_contributor","film_theorist"
      ,"music_contributor","producer","writer"]
     base_url = 'http://data.linkedmdb.org/all/'
-    #for class_name in ListOfClasses:
-    #class_name = "cinematographer"#input("Enter Class Name: ")
+
     class_name="actor"
     KnowledgeGraphCompute(base_url,class_name)
-    print(KnowledgeGraph)
+    print(len(list(KnowledgeGraph.keys())))
 
 if __name__ == '__main__':
     main()
